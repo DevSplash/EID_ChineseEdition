@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>EID Chinese Edition</name>
+    <directory>eidchineseedition</directory>
+    <id>1290363695</id>
+    <description>因为另一个中文版图鉴每次更新都要做图，所以做了个不需要每次都做图的中文版图鉴~
+
+本MOD参照EID修改而来：
+https://steamcommunity.com/sharedfiles/filedetails/?id=836319872
+
+可以通过修改main.lua中的“descriptarray”、“trinketdescriptions”、“cardDescriptions”、“pillDescriptions”内容来增添、修改、删除道具，换行以\n来代替。
+
+可以通过修改参数来更改字号、透明度等
+
+因为此版本是初版，所以可能存在各种未知的问题，且部分道具显示需要美化，如果有什么建议，欢迎大家留言提出~</description>
+    <version>1.4</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Items"/>
+    <tag id="Active Items"/>
+    <tag id="Trinkets"/>
+    <tag id="Pills"/>
+    <tag id="Cards"/>
+    <tag id="Tweaks"/>
+</metadata>
