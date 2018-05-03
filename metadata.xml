@@ -13,7 +13,7 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=836319872
 可以通过修改参数来更改字号、透明度等
 
 因为此版本是初版，所以可能存在各种未知的问题，且部分道具显示需要美化，如果有什么建议，欢迎大家留言提出~</description>
-    <version>1.6</version>
+    <version>1.6.20180503</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>
