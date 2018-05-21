@@ -1225,7 +1225,13 @@ local function onRender(t)
       end
       --Handle Collectibles
     elseif closest.Variant == PickupVariant.PICKUP_COLLECTIBLE then
-      if closest.SubType < 553 then
+      if getModDescription(__eidItemDescriptions,closest.SubType) then
+        local tranformation = "0"
+        if  getModDescription(__eidItemTransformations,closest.SubType) then
+          tranformation = getModDescription(__eidItemTransformations,closest.SubType)
+        end
+        printDescription({getModDescription(__eidItemDescriptions,closest.SubType),tranformation})
+      elseif closest.SubType < 553 then
         if getModDescription(__eidItemTransformations,closest.SubType) then
           printDescription({descriptarray[closest.SubType][2],getModDescription(__eidItemTransformations,closest.SubType)})
         elseif not(descriptarray[closest.SubType]) then
@@ -1233,12 +1239,6 @@ local function onRender(t)
         else
           printDescription(descriptarray[closest.SubType])
         end
-      elseif getModDescription(__eidItemDescriptions,closest.SubType) then
-        local tranformation = "0"
-        if  getModDescription(__eidItemTransformations,closest.SubType) then
-          tranformation = getModDescription(__eidItemTransformations,closest.SubType)
-        end
-        printDescription({getModDescription(__eidItemDescriptions,closest.SubType),tranformation})
       else
         DrawString(config["ErrorMessage"])
       end
