@@ -33,12 +33,12 @@ else
 end
 if StartDebug == nil then
   StartDebug = function()
-    local ok, m = pcall(require, "mobdebug") 
+    local ok, m = pcall(require, "mobdebug")
     if ok and m then
       m.start()
     else
       Isaac.DebugString("Failed to start debugging.")
-      -- m is now the error 
+      -- m is now the error
       -- Isaac.DebugString(m)
     end
   end
@@ -110,6 +110,9 @@ local config = {
   ["DisplayPillInfoShop"]="true",
   ["UnidentifiedPillMessage"]="— 未知胶囊",
   ["ShowUnidentifiedPillDescriptions"]= "false",
+  -- 显示骰子房描述
+  -- Default = true
+  ["DisplayDiceRoomInfo"] = "true",
   -- 设置文字行高
   -- Default = 15
   ["FontLineHeigh"] = 15,
@@ -957,6 +960,14 @@ local transformations = {
   [13]={"Spider Baby","蜘蛛套"}
 }
 
+local diceDescriptions= {
+  [0]="重置所持有的全部道具",
+  [1]="重置骰子房所有掉落物",
+  [2]="重置本层的所有掉落物",
+  [3]="重置本层中所有的道具",
+  [4]="重置本层然后重新开始",
+  [5]="重置持有及本层掉落物"
+}
 --[[
   Init variables for other mods to hand over Descriptions
   if they were not yet inited by another mod.
@@ -1000,7 +1011,7 @@ function table.load( sfile )
     end
   end
   return tables[1]
-end 
+end
 function SubStringUTF8(str, startIndex, endIndex)
   if startIndex < 0 then
     startIndex = SubStringGetTotalIndex(str) + startIndex + 1;
@@ -1010,7 +1021,7 @@ function SubStringUTF8(str, startIndex, endIndex)
     endIndex = SubStringGetTotalIndex(str) + endIndex + 1;
   end
 
-  if endIndex == nil then 
+  if endIndex == nil then
     return string.sub(str, SubStringGetTrueIndex(str, startIndex));
   else
     return string.sub(str, SubStringGetTrueIndex(str, startIndex), SubStringGetTrueIndex(str, endIndex + 1) - 1);
@@ -1021,7 +1032,7 @@ function SubStringGetTotalIndex(str)
   local curIndex = 0;
   local i = 1;
   local lastCount = 1;
-  repeat 
+  repeat
     lastCount = SubStringGetByteCount(str, i)
     i = i + lastCount;
     curIndex = curIndex + 1;
@@ -1033,7 +1044,7 @@ function SubStringGetTrueIndex(str, index)
   local curIndex = 0;
   local i = 1;
   local lastCount = 1;
-  repeat 
+  repeat
     lastCount = SubStringGetByteCount(str, i)
     i = i + lastCount;
     curIndex = curIndex + 1;
@@ -1081,9 +1092,9 @@ function FontPreLoad()
   end
 end
 
-function DrawString(str,x,y)
-  if not(str) then 
-    str="传入字符串为空！"
+function DrawString(str,x,y,nowrap)
+  if not(str) then
+    return
   end
   local word = ""
   local lastid = 0
@@ -1102,7 +1113,7 @@ function DrawString(str,x,y)
       if not(fontmap[word]) then
         word = "?"
       end
-      if (word ~= "，" and word ~= "。" and DrawPositionX + fontmap[word].xadvance * fontScaleReal + 2 > config["FontMaxLength"]) then
+      if (not(nowrap) and (word ~= "，" and word ~= "。" and DrawPositionX + fontmap[word].xadvance * fontScaleReal + 2 > config["FontMaxLength"])) then
         DrawPositionX = config["XPosition"]
         DrawPositionY = DrawPositionY + config["FontLineHeigh"] * fontScaleReal
         lastid = 0
@@ -1185,7 +1196,7 @@ function HasCurseBlind()
     t[#t+1]=rest
     num=(num-rest)/2
   end
-  return #t>6 and t[7]==1 
+  return #t>6 and t[7]==1
 end
 
 local function onRender(t)
@@ -1196,18 +1207,21 @@ local function onRender(t)
   local closest = nil;
   local dist = 10000;
   for i, coin in ipairs(Isaac.GetRoomEntities()) do
-    if coin.Type == EntityType.ENTITY_PICKUP and (coin.Variant == PickupVariant.PICKUP_COLLECTIBLE or coin.Variant == PickupVariant.PICKUP_TRINKET or coin.Variant == PickupVariant.PICKUP_TAROTCARD or coin.Variant == PickupVariant.PICKUP_PILL) and coin.SubType>0  then
+    if coin.Type == EntityType.ENTITY_PICKUP and (coin.Variant == PickupVariant.PICKUP_COLLECTIBLE or coin.Variant == PickupVariant.PICKUP_TRINKET or coin.Variant == PickupVariant.PICKUP_TAROTCARD or coin.Variant == PickupVariant.PICKUP_PILL) and coin.SubType>0 then
       local diff = coin.Position:__sub(player.Position);
       if diff:Length() < dist then
         closest = coin;
         dist = diff:Length();
-      end  
+      end
+    elseif not(config["DisplayDiceRoomInfo"]=="false") and coin.Type == EntityType.ENTITY_EFFECT and coin.Variant == EffectVariant.DICE_FLOOR then
+      local CurrentRoom=Game():GetRoom();
+      DrawString(diceDescriptions[coin.SubType],CurrentRoom:GetRenderSurfaceTopLeft().X+CurrentRoom:GetCenterPos().X/2,CurrentRoom:GetRenderSurfaceTopLeft().Y+CurrentRoom:GetCenterPos().Y/2-70,true);
     end
-  end 
-
+  end
   if dist/40>tonumber(config["MaxDistance"]) then
     return
   end
+
   --TODO: Load Mode 3
   if closest.Type == EntityType.ENTITY_PICKUP then
     if closest.Variant == PickupVariant.PICKUP_TRINKET then
@@ -1245,7 +1259,7 @@ local function onRender(t)
       --Handle Cards & Runes
     elseif closest.Variant == PickupVariant.PICKUP_TAROTCARD then
       if not(config["DisplayCardInfo"]=="false") and not(closest:ToPickup():IsShopItem() and config["DisplayCardInfoShop"]=="false") then
-        if closest.SubType < 55 then 
+        if closest.SubType < 55 then
           if not(cardDescriptions[closest.SubType]) then
             DrawString("— 未知卡牌："..closest.SubType)
           else
@@ -1273,10 +1287,9 @@ local function onRender(t)
         pillEffect = pool:GetPillEffect(pillColor)
         identified = pool:
         IsPillIdentified(pillColor)
-
         if (identified or config["ShowUnidentifiedPillDescriptions"]== "true") then
           if (pillEffect < 47) or getModDescription(__eidPillDescriptions,pillEffect) then
-            if pillEffect < 47 then 
+            if pillEffect < 47 then
               if not(pillDescriptions[pillEffect]) then
                 DrawString("— 未知胶囊："..pillEffect)
               else
