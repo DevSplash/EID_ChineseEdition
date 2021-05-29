@@ -6,12 +6,14 @@
     <description>支持中文字符的图鉴MOD，参照EID修改而来：
 https://steamcommunity.com/sharedfiles/filedetails/?id=836319872
 
-可以通过修改main.lua中的“descriptarray”、“trinketdescriptions”、“cardDescriptions”、“pillDescriptions”内容来增添、修改、删除道具，换行以\n来代替。
+可以通过修改"descriptions\ab+.lua"中的“collectibleDescriptions”、“trinketDescriptions”、“cardDescriptions”、“pillDescriptions”内容来增添、修改、删除ab+的道具；
+修改"descriptions\rep.lua"中的“collectiblePatch”、“trinketPatch”、“cardPatch”、“pillPatch”内容来增添、修改、删除rep与ab+道具的差异部分。
+其中换行以\n来代替，除此以外不要以任何形式出现“\”字符！
 
 可以通过修改参数来更改字号、透明度等
 
 如果有什么建议，欢迎大家留言提出~</description>
-    <version>1.8.20180523</version>
+    <version>1.9.1.20210529</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>
