@@ -5,7 +5,6 @@ if RegisterMod == nil then
       Name = modname,
       AddCallback = function(self, callbackId, fn, entityId)
         if entityId == nil then entityId = -1; end
-
         Isaac.AddCallback(self, callbackId, fn, entityId)
       end,
       RemoveCallback = function(self, callbackId, fn)
@@ -359,14 +358,22 @@ local function onRender(t)
   if closest.Type == EntityType.ENTITY_PICKUP then
     if closest.Variant == PickupVariant.PICKUP_TRINKET then
       --Handle Trinkets
-      if closest.SubType <= trinketCount then
-        if not(trinketDescriptions[closest.SubType]) then
-          DrawString("— 未知饰品："..closest.SubType)
+      local goldenOffset = 32768
+      local trinketId = closest.SubType
+      local goldenTrinketDescription = ""
+      -- REP判断金饰品
+      if gameVersion == "rep" and trinketId > goldenOffset then
+        trinketId = trinketId - goldenOffset
+        goldenTrinketDescription = "\n·金饰品：效果翻倍"
+      end
+      if trinketId <= trinketCount then
+        if not(trinketDescriptions[trinketId]) then
+          DrawString("— 未知饰品："..trinketId..goldenTrinketDescription)
         else
-          DrawString(trinketDescriptions[closest.SubType])
+          DrawString(trinketDescriptions[trinketId]..goldenTrinketDescription)
         end
-      elseif getModDescription(__eidTrinketDescriptions,closest.SubType) then
-        DrawString(getModDescription(__eidTrinketDescriptions,closest.SubType))
+      elseif getModDescription(__eidTrinketDescriptions, trinketId) then
+        DrawString(getModDescription(__eidTrinketDescriptions, trinketId)..goldenTrinketDescription)
       else
         DrawString(config["ErrorMessage"])
       end
