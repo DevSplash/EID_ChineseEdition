@@ -70,7 +70,7 @@ end
 __eidItemDescriptions[item] = "Most Fitting Description";
 
 --]]
-local config = require("config")
+local config = require("config.lua")
 local fontsizeReal = config["FontSize"]
 if fontsizeReal < 18 then
   fontsizeReal = 15
